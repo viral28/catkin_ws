@@ -40,6 +40,7 @@ http://www.cisst.org/cisst/license.txt.
 
 int main(int argc, char ** argv)
 {
+    bool usingSimulink = true;
     // log configuration
     cmnLogger::SetMask(CMN_LOG_ALLOW_ALL);
     cmnLogger::SetMaskDefaultLog(CMN_LOG_ALLOW_ALL);
@@ -143,15 +144,21 @@ int main(int argc, char ** argv)
     mtsIntuitiveResearchKitConsole::Arm * mtm
             = new mtsIntuitiveResearchKitConsole::Arm(masterName, io->GetName());
     mtm->ConfigurePID(configFiles["pid-master"]);
+    if(usingSimulink) {
+           mtm->ConfigureSimulinkController(7);
+    }
     mtm->ConfigureArm(mtsIntuitiveResearchKitConsole::Arm::ARM_MTM,
-                               configFiles["kinematic-master"], 3.0 * cmn_ms);
+                               configFiles["kinematic-master"], 3.0 * cmn_ms, usingSimulink);
     console->AddArm(mtm);
 
     mtsIntuitiveResearchKitConsole::Arm * psm
             = new mtsIntuitiveResearchKitConsole::Arm(slaveName, io->GetName());
     psm->ConfigurePID(configFiles["pid-slave"]);
+    if(usingSimulink) {
+           psm->ConfigureSimulinkController(8);
+    }
     psm->ConfigureArm(mtsIntuitiveResearchKitConsole::Arm::ARM_PSM,
-                               configFiles["kinematic-slave"], 3.0 * cmn_ms);
+                               configFiles["kinematic-slave"], 3.0 * cmn_ms, usingSimulink);
     console->AddArm(psm);
 
     // connect ioGUIMaster to io
